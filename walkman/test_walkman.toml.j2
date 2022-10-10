@@ -1,0 +1,26 @@
+# ################################################################# #
+# Simple manual test to ensure jack/pyo/walkman are working.        #
+                                                                    #
+[configure]                                                         #
+name = "c9p4_test"                                                  #
+                                                                    #
+# ################################################################# #
+
+[configure.audio]
+channel_count = 2
+
+[configure.module.mixer.master_output]
+send_to_physical_output = true
+audio_input_0 = "sine.test"
+
+[configure.module.sine.test]
+
+[configure.module.value.sine_test_child_decibel]
+value = -20
+
+[configure.module.value.sine_test_child_frequency]
+value = 440
+
+[cue.1]
+
+[cue.2.sine.test]
