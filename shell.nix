@@ -58,9 +58,5 @@ in
       # python with relevant packages
       python-9-4
       mbrola
-      # Sound
-      qjackctl
-      pipewire
-      qpwgraph
     ];
   }
