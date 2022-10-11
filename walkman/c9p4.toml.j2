@@ -10,10 +10,13 @@ name = "c9p4"                                                       #
 {# I use midi controller "Midi Fighter Twisted". #}
 {# Number is ascending from left to right and then #}
 {# to the next level. #}
-{% set midi_control_number_offset = 16 %}
-{% set midi_control_number_line_speaker = midi_control_number_offset %}
-{% set midi_control_number_line_degrader = midi_control_number_offset + 1 %}
 
+{% set midi_control_number_offset = 16 %}
+{% set midi_control_number_line_master = midi_control_number_offset %}
+{% set midi_control_number_line_speaker = midi_control_number_offset + 1 %}
+{% set midi_control_number_line_degrader = midi_control_number_offset + 2 %}
+
+{% set line_size = 4 %}
 
 {% set speaker_count = 2 %}
 {% set channel_count = 2 %}
@@ -23,8 +26,18 @@ channel_count = {{ channel_count }}
 
 [configure.module.mixer.master_output]
 send_to_physical_output = true
+decibel = "midi_control_input.master_decibel"
+audio_input_0 = "mixer.pre_master"
+audio_input_1 = "waveguide_reverb.reverb"
+
+[configure.module.mixer.pre_master]
 audio_input_0 = "mixer.speaker"
-audio_input_1 = "degrader.0"
+audio_input_1 = "mixer.degrader"
+
+[configure.module.waveguide_reverb.reverb]
+decibel = "midi_control_input.reverb_decibel"
+# XXX: Doesn't work! Bug in walkman! Has to be fixed!
+# audio_input = "mixer.pre_master"
 
 [configure.module.mixer.speaker]
 decibel = "midi_control_input.speaker_decibel"
@@ -39,7 +52,7 @@ audio_input_{{ speaker_index }} = "speaker.{{ speaker_index }}"
 
 {% for speaker_index in range(speaker_count) %}
 [configure.module.speaker.{{ speaker_index }}]
-audio_input = "audio_input.0"
+audio_input = "degrader.0"
 threshold = "midi_control_input.speaker_threshold"
 
 [configure.module.value.speaker_{{ speaker_index }}_child_decibel]
@@ -49,11 +62,38 @@ value = 0
 [configure.module.audio_input.0]
 input_channel_index = 0
 
+[configure.module.mixer.degrader]
+audio_input_0 = "degrader.0"
+decibel = "midi_control_input.degrader_decibel"
+
 [configure.module.degrader.0]
 audio_input = "audio_input.0"
-decibel = "midi_control_input.degrader_decibel"
 bitdepth = "midi_control_input.degrader_bitdepth"
 sample_rate_scale = "midi_control_input.degrader_sample_rate_scale"
+
+[configure.module.midi_logger.test]
+
+# #################################################################
+# START Configure MIDI Input MASTER ###############################
+
+[configure.module.midi_control_input.master_decibel]
+midi_control_number = {{ midi_control_number_line_master }}
+initial_value = -6
+
+[configure.module.midi_control_input.master_decibel.default_dict]
+minima = -100
+maxima = 12
+
+[configure.module.midi_control_input.reverb_decibel]
+midi_control_number = {{ midi_control_number_line_master + line_size }}
+initial_value = -20
+
+[configure.module.midi_control_input.reverb_decibel.default_dict]
+minima = -100
+maxima = 12
+
+# END Configure MIDI Input MASTER #################################
+# #################################################################
 
 
 # #################################################################
@@ -68,7 +108,7 @@ minima = -100
 maxima = 0
 
 [configure.module.midi_control_input.speaker_threshold]
-midi_control_number = {{ midi_control_number_line_speaker + 4 }}
+midi_control_number = {{ midi_control_number_line_speaker + line_size }}
 initial_value = -12
 
 [configure.module.midi_control_input.speaker_threshold.default_dict]
@@ -91,7 +131,7 @@ minima = -100
 maxima = 0
 
 [configure.module.midi_control_input.degrader_bitdepth]
-midi_control_number = {{ midi_control_number_line_degrader + 4 }}
+midi_control_number = {{ midi_control_number_line_degrader + line_size }}
 initial_value = 16
 
 [configure.module.midi_control_input.degrader_bitdepth.default_dict]
@@ -99,7 +139,7 @@ minima = 1
 maxima = 32
 
 [configure.module.midi_control_input.degrader_sample_rate_scale]
-midi_control_number = {{ midi_control_number_line_degrader + 8 }}
+midi_control_number = {{ midi_control_number_line_degrader + (2 * line_size) }}
 initial_value = 0.5
 
 [configure.module.midi_control_input.degrader_sample_rate_scale.default_dict]
@@ -109,15 +149,14 @@ maxima = 1
 # END Configure MIDI Input DEGRADER   #############################
 # #################################################################
 
-[configure.module.midi_logger.test]
 
 # =================================================================
 # =================================================================
 
-[cue.1.midi_logger.test]
+[cue.midi_test.midi_logger.test]
 
-[cue.2.speaker.0]
-[cue.2.speaker.1]
-[cue.2.degrader.0]
+{% for speaker_index in range(speaker_count) %}
+[cue.main.speaker.{{ speaker_index }}]
+{% endfor %}
 
-[cue.3.degrader.0]
+[cue.main.degrader.0]
