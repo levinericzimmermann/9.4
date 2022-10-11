@@ -3,6 +3,8 @@ import random
 import typing
 import uuid
 
+import voxpopuli
+
 from mutwo import core_converters
 from mutwo import core_events
 from mutwo import mbrola_converters
@@ -48,7 +50,7 @@ class TextToSequentialEvent(core_converters.abc.Converter):
 
 
 class SequentialEventToSoundFilePathTuple(core_converters.abc.Converter):
-    def __init__(self):
+    def __init__(self, language: str = "de"):
         def simple_event_to_phoneme_string(
             event_to_convert: music_events.NoteLike,
         ) -> str:
@@ -80,7 +82,8 @@ class SequentialEventToSoundFilePathTuple(core_converters.abc.Converter):
         event_to_phoneme_list.convert = event_to_phoneme_list_convert_new
 
         self.event_to_speak_synthesis = mbrola_converters.EventToSpeakSynthesis(
-            event_to_phoneme_list=event_to_phoneme_list
+            event_to_phoneme_list=event_to_phoneme_list,
+            voice=voxpopuli.Voice(lang=language),
         )
 
     def convert(
