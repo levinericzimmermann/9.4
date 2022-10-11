@@ -6,21 +6,69 @@ name = "c9p4"                                                       #
                                                                     #
 # ################################################################# #
 
+{# I use midi controller "Midi Fighter Twisted". #}
+{# Number is ascending from left to right and then #}
+{# to the next level. #}
+
+{% set midi_control_number_offset = 16 %}
+
 [configure.audio]
 channel_count = 2
 
 [configure.module.mixer.master_output]
 send_to_physical_output = true
-audio_input_0 = "sine.test"
+audio_input_0 = "speaker.0"
+audio_input_1 = "degrader.0"
 
-[configure.module.sine.test]
+[configure.module.audio_input.0]
+input_channel_index = 0
 
-[configure.module.value.sine_test_child_decibel]
-value = -20
+[configure.module.speaker.0]
+audio_input = "audio_input.0"
+decibel = "midi_control_input.speaker_decibel"
+threshold = "midi_control_input.speaker_threshold"
 
-[configure.module.value.sine_test_child_frequency]
-value = 440
+[configure.module.degrader.0]
+audio_input = "audio_input.0"
+decibel = "midi_control_input.degrader_decibel"
 
-[cue.1]
+[configure.module.midi_control_input.speaker_decibel]
+midi_control_number = {{ midi_control_number_offset }}
+initial_value = -6
 
-[cue.2.sine.test]
+[configure.module.midi_control_input.speaker_decibel.default_dict]
+minima = -100
+maxima = 0
+
+[configure.module.midi_control_input.speaker_threshold]
+midi_control_number = {{ midi_control_number_offset + 4 }}
+initial_value = -12
+
+[configure.module.midi_control_input.speaker_threshold.default_dict]
+minima = -60
+maxima = 0
+
+[configure.module.midi_control_input.degrader_decibel]
+midi_control_number = {{ midi_control_number_offset + 1 }}
+initial_value = -6
+
+[configure.module.midi_control_input.degrader_decibel.default_dict]
+minima = -100
+maxima = 0
+
+# [configure.module.value.speaker_0_child_decibel]
+# value = -6
+# 
+# [configure.module.value.degrader_0_child_decibel]
+# value = -6
+#
+
+[configure.module.midi_logger.test]
+
+[cue.1.midi_logger.test]
+
+[cue.2.speaker.0]
+
+[cue.2.degrader.0]
+
+[cue.3.degrader.0]

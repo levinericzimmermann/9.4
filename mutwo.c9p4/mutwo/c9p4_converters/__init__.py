@@ -11,4 +11,8 @@ def fix_mbrola_voices_path():
 fix_mbrola_voices_path()
 del fix_mbrola_voices_path
 
+# XXX: Ensure music monkey patch is applied!
+from mutwo import c9p4_parameters
+del c9p4_parameters
+
 from .text_to_speech import *

@@ -1,0 +1,4 @@
+#! /usr/bin/env cached-nix-shell
+#! nix-shell -i bash ../shell.nix
+
+qjackctl --active-patchbay=./etc/qjackctl/c9p4_stereo_test.xml & walkman walkman/c9p4.toml.j2 & mpv radio.ogg

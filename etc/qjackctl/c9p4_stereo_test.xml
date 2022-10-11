@@ -1,0 +1,72 @@
+<!DOCTYPE patchbay>
+<patchbay name="c9p4_stereo_test" version="0.9.6">
+ <output-sockets>
+  <socket name="Built-in Audio Analog Stereo" exclusive="off" client="Built\-in\ Audio\ Analog\ Stereo" type="jack-audio">
+   <plug>capture_FL</plug>
+   <plug>capture_FR</plug>
+  </socket>
+  <socket name="walkman_2" exclusive="off" client="walkman_2" type="jack-audio">
+   <plug>output_1</plug>
+   <plug>output_2</plug>
+  </socket>
+  <socket name="mpv" exclusive="off" client="mpv" type="jack-audio">
+   <plug>output_FL</plug>
+   <plug>output_FR</plug>
+  </socket>
+  <socket name="Built-in Audio Analog Stereo Monitor" exclusive="off" client="Built\-in\ Audio\ Analog\ Stereo\ Monitor" type="jack-audio">
+   <plug>monitor_FL</plug>
+   <plug>monitor_FR</plug>
+  </socket>
+  <socket name="Midi-Bridge" exclusive="off" client="Midi\-Bridge" type="jack-midi">
+   <plug>Midi\ Through\:\(capture_0\)\ Midi\ Through\ Port\-0</plug>
+   <plug>Midi\ Fighter\ Twister\:\(capture_0\)\ Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+  <socket name="walkman_2" exclusive="off" client="walkman_2" type="jack-midi">
+   <plug>output</plug>
+  </socket>
+  <socket name="Midi-Bridge 2" exclusive="off" client="Midi\-Bridge" type="jack-midi">
+   <plug>Midi\ Fighter\ Twister\:\(capture_0\)\ Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+  <socket name="Midi Through" exclusive="off" client="Midi\ Through" type="alsa-midi">
+   <plug>Midi\ Through\ Port\-0</plug>
+  </socket>
+  <socket name="Midi Fighter Twister" exclusive="off" client="Midi\ Fighter\ Twister" type="alsa-midi">
+   <plug>Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket name="Built-in Audio Analog Stereo" exclusive="off" client="Built\-in\ Audio\ Analog\ Stereo" type="jack-audio">
+   <plug>playback_FL</plug>
+   <plug>playback_FR</plug>
+  </socket>
+  <socket name="walkman_2" exclusive="off" client="walkman_2" type="jack-audio">
+   <plug>input_1</plug>
+   <plug>input_2</plug>
+  </socket>
+  <socket name="Midi-Bridge" exclusive="off" client="Midi\-Bridge" type="jack-midi">
+   <plug>Midi\ Through\:\(playback_0\)\ Midi\ Through\ Port\-0</plug>
+   <plug>Midi\ Fighter\ Twister\:\(playback_0\)\ Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+  <socket name="walkman_2" exclusive="off" client="walkman_2" type="jack-midi">
+   <plug>input</plug>
+  </socket>
+  <socket name="Midi Through" exclusive="off" client="Midi\ Through" type="alsa-midi">
+   <plug>Midi\ Through\ Port\-0</plug>
+  </socket>
+  <socket name="Midi Fighter Twister" exclusive="off" client="Midi\ Fighter\ Twister" type="alsa-midi">
+   <plug>Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+  <socket name="PipeWire-RT-Event" exclusive="off" client="PipeWire\-RT\-Event" type="alsa-midi">
+   <plug>input</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable input="Built-in Audio Analog Stereo" type="jack-audio" output="walkman_2"/>
+  <cable input="walkman_2" type="jack-audio" output="mpv"/>
+  <cable input="walkman_2" type="jack-midi" output="Midi-Bridge 2"/>
+  <cable input="PipeWire-RT-Event" type="alsa-midi" output="Midi Through"/>
+  <cable input="PipeWire-RT-Event" type="alsa-midi" output="Midi Fighter Twister"/>
+ </cables>
+</patchbay>
+
