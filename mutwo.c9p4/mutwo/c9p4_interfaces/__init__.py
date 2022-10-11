@@ -1,12 +1,22 @@
 import collections
 import concurrent.futures
 import os
+import random
 
 from mutwo import c9p4_converters
 from mutwo import c9p4_generators
 
 
 class SpeechSoundFileStack(collections.deque):
+    language_tuple = ("de", "fr", "es", "it", "pt")
+    language_to_language_code = {
+        "de": "deu-Latn",
+        "fr": "fra-Latn",
+        "es": "spa-Latn",
+        "it": "ita-Latn",
+        "pt": "por-Latn",
+    }
+
     def __init__(
         self,
         text_generator: c9p4_generators.TextGenerator = c9p4_generators.OfflineTextGenerator(),
@@ -28,10 +38,12 @@ class SpeechSoundFileStack(collections.deque):
 
     def _fill(self, thread: bool = True):
         def get_sound_file_path_tuple():
+            language = random.choice(self.language_tuple)
+            language_code = self.language_to_language_code[language]
             text = self.text_generator()
-            sequential_event = self.text_to_sequential_event(text)
+            sequential_event = self.text_to_sequential_event(text, language_code)
             sound_file_path_tuple = self.sequential_event_to_sound_file_path_tuple(
-                sequential_event
+                sequential_event, language
             )
             return sound_file_path_tuple
 
