@@ -1,8 +1,16 @@
+from __future__ import annotations
 import os
+import typing
+import sys
 
+import numpy as np
 from mutwo import c9p4_interfaces
 import pyo
 import walkman
+
+# http://ajaxsoundstudio.com/pyodoc/perftips.html#adjust-the-interpreter-s-check-interval
+# AttributeError: module 'sys' has no attribute 'setcheckinterval'
+# sys.setcheckinterval(500)
 
 
 class Speaker(
@@ -24,9 +32,7 @@ class Speaker(
                     pass
                 else:
                     old_sound_file_path = self.sound_file_player.path
-                    self.sound_file_player.setPath(
-                        new_sound_file_path
-                    )
+                    self.sound_file_player.setPath(new_sound_file_path)
                     self.path_to_remove_list.append(old_sound_file_path)
                 self.sound_file_player.play()
 
@@ -107,3 +113,55 @@ class MidiLogger(walkman.Module):
     @property
     def _pyo_object(self) -> pyo.PyoObject:
         return self.midi_control_scanner
+
+
+# Please see https://cnmat.berkeley.edu/sites/default/files/patches/Picture%203_0.png
+Frequency = float
+Amplitude = float
+DecayRate = float
+ResonatorConfiguration = typing.Tuple[Frequency, Amplitude, DecayRate]
+FilePath = str
+SliceIndex = int
+ResonanceConfigurationFilePathList = typing.List[
+    typing.Union[
+        typing.Tuple[Amplitude, FilePath], typing.Tuple[Amplitude, FilePath, SliceIndex]
+    ]
+]
+
+
+class Resonator(
+    walkman.ModuleWithDecibel,
+    decibel=walkman.AutoSetup(walkman.Parameter),
+    audio_input=walkman.Catch(walkman.constants.EMPTY_MODULE_INSTANCE_NAME),
+):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _setup_pyo_object(self):
+        super()._setup_pyo_object()
+        self.resonator_list = []
+        frequency_list = [220, 440, 880]
+        decay_list = [1, 0.5, 0.2]
+        amplitude_list = [0.9, 0.4, 0.2]
+        complex_resonator = pyo.ComplexRes(
+            self.audio_input.pyo_object,
+            freq=frequency_list,
+            decay=decay_list,
+            mul=amplitude_list,
+        ).stop()
+        mixed_resonator = complex_resonator.mix(1) * self.amplitude_signal_to
+        complex_resonator_with_applied_amplitude = mixed_resonator
+
+        internal_pyo_object_list = [
+            mixed_resonator,
+            complex_resonator_with_applied_amplitude,
+            complex_resonator,
+        ]
+
+        self.internal_pyo_object_list.extend(internal_pyo_object_list)
+
+        self.resonator = complex_resonator_with_applied_amplitude
+
+    @property
+    def _pyo_object(self) -> pyo.PyoObject:
+        return self.resonator

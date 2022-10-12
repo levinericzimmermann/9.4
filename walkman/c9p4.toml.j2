@@ -15,6 +15,7 @@ name = "c9p4"                                                       #
 {% set midi_control_number_line_master = midi_control_number_offset %}
 {% set midi_control_number_line_speaker = midi_control_number_offset + 1 %}
 {% set midi_control_number_line_degrader = midi_control_number_offset + 2 %}
+{% set midi_control_number_line_resonator = midi_control_number_offset + 3 %}
 
 {% set line_size = 4 %}
 
@@ -33,6 +34,7 @@ audio_input_1 = "waveguide_reverb.reverb"
 [configure.module.mixer.pre_master]
 audio_input_0 = "mixer.speaker"
 audio_input_1 = "mixer.degrader"
+audio_input_2 = "resonator.0"
 
 [configure.module.waveguide_reverb.reverb]
 decibel = "midi_control_input.reverb_decibel"
@@ -73,6 +75,11 @@ sample_rate_scale = "midi_control_input.degrader_sample_rate_scale"
 
 [configure.module.midi_logger.test]
 
+[configure.module.resonator.0]
+# audio_input = "mixer.speaker"
+audio_input = "speaker.0"
+decibel = "midi_control_input.resonator_decibel"
+
 # #################################################################
 # START Configure MIDI Input MASTER ###############################
 
@@ -93,6 +100,21 @@ minima = -100
 maxima = 12
 
 # END Configure MIDI Input MASTER #################################
+# #################################################################
+
+
+# #################################################################
+# START Configure MIDI Input RESONATOR ############################
+
+[configure.module.midi_control_input.resonator_decibel]
+midi_control_number = {{ midi_control_number_line_resonator }}
+initial_value = -6
+
+[configure.module.midi_control_input.resonator_decibel.default_dict]
+minima = -100
+maxima = 12
+
+# END Configure MIDI Input RESONATOR ##############################
 # #################################################################
 
 
