@@ -34,7 +34,7 @@ audio_input_1 = "waveguide_reverb.reverb"
 [configure.module.mixer.pre_master]
 audio_input_0 = "mixer.speaker"
 audio_input_1 = "mixer.degrader"
-audio_input_2 = "resonator.0"
+audio_input_2 = "mixer.resonator"
 
 [configure.module.waveguide_reverb.reverb]
 decibel = "midi_control_input.reverb_decibel"
@@ -75,10 +75,19 @@ sample_rate_scale = "midi_control_input.degrader_sample_rate_scale"
 
 [configure.module.midi_logger.test]
 
-[configure.module.resonator.0]
-# audio_input = "mixer.speaker"
-audio_input = "speaker.0"
+[configure.module.mixer.resonator]
 decibel = "midi_control_input.resonator_decibel"
+{% for resonator_index in range(speaker_count) %}
+audio_input_{{ resonator_index }} = "resonator.{{ resonator_index }}"
+{% endfor %}
+
+{% for resonator_index in range(speaker_count) %}
+[configure.module.resonator.{{ resonator_index }}]
+# audio_input = "mixer.speaker"
+frequency = "midi_control_input.resonator_frequency"
+audio_input = "speaker.{{ resonator_index }}"
+decibel = "midi_control_input.resonator_decibel"
+{% endfor %}
 
 # #################################################################
 # START Configure MIDI Input MASTER ###############################
@@ -113,6 +122,14 @@ initial_value = -6
 [configure.module.midi_control_input.resonator_decibel.default_dict]
 minima = -100
 maxima = 12
+
+[configure.module.midi_control_input.resonator_frequency]
+midi_control_number = {{ midi_control_number_line_resonator + 4 }}
+initial_value = 220
+
+[configure.module.midi_control_input.resonator_frequency.default_dict]
+minima = 100
+maxima = 1000
 
 # END Configure MIDI Input RESONATOR ##############################
 # #################################################################
