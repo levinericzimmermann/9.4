@@ -43,7 +43,7 @@ class SpeechSoundFileStack(collections.deque):
             text = self.text_generator()
             sequential_event = self.text_to_sequential_event(text, language_code)
             sound_file_path_tuple = self.sequential_event_to_sound_file_path_tuple(
-                sequential_event, language
+                sequential_event, language=language
             )
             return sound_file_path_tuple
 
