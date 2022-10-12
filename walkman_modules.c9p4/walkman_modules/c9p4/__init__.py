@@ -146,7 +146,7 @@ class Resonator(
             frequency = self.frequency.pyo_object_or_float * partial_index
             decay = 1 / positive_partial_index
             amplitude = (
-                (pyo.LFO(freq=random.uniform(0.9, 7), type=random.uniform(0, 7)) + 1)
+                (pyo.LFO(freq=random.uniform(0.9, 7), type=int(random.uniform(0, 7)) + 1))
                 / 2
             ) * (1 / positive_partial_index)
 
