@@ -125,15 +125,24 @@ Partial = tuple[Frequency, Amplitude, DecayRate]
 class Resonator(
     walkman.ModuleWithDecibel,
     decibel=walkman.AutoSetup(walkman.Parameter),
-    frequency=walkman.AutoSetup(walkman.Value, module_kwargs={"value": 220}),
+    pitch_ratio=walkman.AutoSetup(walkman.Value, module_kwargs={"value": 1}),
     audio_input=walkman.Catch(walkman.constants.EMPTY_MODULE_INSTANCE_NAME),
 ):
+    default_frequency = 220
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def _setup_pyo_object(self):
         super()._setup_pyo_object()
-        internal_pyo_object_list = []
+
+        self.pick_octave = pyo.Choice([0.5, 1, 2], freq=random.uniform(0.4, 0.9))
+        self.octave = pyo.Port(self.pick_octave)
+        self.base_pitch = (
+            self.octave * self.default_frequency * self.pitch_ratio.pyo_object_or_float
+        )
+
+        internal_pyo_object_list = [self.pick_octave, self.octave, self.base_pitch]
 
         frequency_list = []
         decay_list = []
@@ -143,10 +152,14 @@ class Resonator(
         for partial_index in range(partial_count):
             positive_partial_index = partial_index + 1
 
-            frequency = self.frequency.pyo_object_or_float * partial_index
+            frequency = self.base_pitch * partial_index
             decay = 1 / positive_partial_index
             amplitude = (
-                (pyo.LFO(freq=random.uniform(0.9, 7), type=int(random.uniform(0, 7)) + 1))
+                (
+                    pyo.LFO(
+                        freq=random.uniform(0.9, 7), type=int(random.uniform(0, 7)) + 1
+                    )
+                )
                 / 2
             ) * (1 / positive_partial_index)
 
@@ -178,3 +191,40 @@ class Resonator(
     @property
     def _pyo_object(self) -> pyo.PyoObject:
         return self.resonator
+
+
+class PitchRatioDetector(
+    walkman.Module,
+    audio_input=walkman.Catch(walkman.constants.EMPTY_MODULE_INSTANCE_NAME),
+):
+    def __init__(
+        self,
+        *args,
+        min_frequency=walkman.AutoSetup(walkman.Value, module_kwargs={"value": 100}),
+        max_frequency=walkman.AutoSetup(walkman.Value, module_kwargs={"value": 400}),
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.min_frequency = min_frequency
+        self.max_frequency = max_frequency
+
+    def _setup_pyo_object(self):
+        super()._setup_pyo_object()
+        self.yin = pyo.Yin(
+            self.audio_input.pyo_object,
+            minfreq=self.min_frequency,
+            maxfreq=self.max_frequency,
+            cutoff=self.max_frequency,
+        )
+        self.midi_note = pyo.FToM(self.yin)
+        self.midi_pitch_class = self.midi_note % 12
+        self.pitch_class_frequency = pyo.MToF(self.midi_pitch_class)
+        self.pitch_ratio = self.midi_pitch_class / 13.5
+
+        self.internal_pyo_object_list.extend(
+            [self.yin, self.midi_pitch_class, self.pitch_ratio]
+        )
+
+    @property
+    def _pyo_object(self) -> pyo.PyoObject:
+        return self.pitch_ratio
