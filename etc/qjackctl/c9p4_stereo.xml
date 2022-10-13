@@ -1,0 +1,155 @@
+<!DOCTYPE patchbay>
+<patchbay name="c9p4_stereo" version="0.9.6">
+ <output-sockets>
+  <socket client="Built\-in\ Audio\ Analog\ Stereo" name="Built-in Audio Analog Stereo" exclusive="off" type="jack-audio">
+   <plug>capture_FL</plug>
+   <plug>capture_FR</plug>
+  </socket>
+  <socket client="Scarlett\ 18i20\ USB\ Multichannel" name="Scarlett 18i20 USB Multichannel" exclusive="off" type="jack-audio">
+   <plug>capture_FL</plug>
+   <plug>capture_FR</plug>
+   <plug>capture_RL</plug>
+   <plug>capture_RR</plug>
+   <plug>capture_FC</plug>
+   <plug>capture_LFE</plug>
+   <plug>capture_SL</plug>
+   <plug>capture_SR</plug>
+   <plug>capture_AUX0</plug>
+   <plug>capture_AUX1</plug>
+  </socket>
+  <socket client="mpv" name="mpv" exclusive="off" type="jack-audio">
+   <plug>output_FL</plug>
+   <plug>output_FR</plug>
+  </socket>
+  <socket client="walkman_2" name="walkman_2" exclusive="off" type="jack-audio">
+   <plug>output_1</plug>
+   <plug>output_2</plug>
+  </socket>
+  <socket client="Scarlett\ 18i20\ USB\ Multichannel\ Monitor" name="Scarlett 18i20 USB Multichannel Monitor" exclusive="off" type="jack-audio">
+   <plug>monitor_FL</plug>
+   <plug>monitor_FR</plug>
+   <plug>monitor_RL</plug>
+   <plug>monitor_RR</plug>
+   <plug>monitor_FC</plug>
+   <plug>monitor_LFE</plug>
+   <plug>monitor_SL</plug>
+   <plug>monitor_SR</plug>
+   <plug>monitor_AUX0</plug>
+   <plug>monitor_AUX1</plug>
+  </socket>
+  <socket client="Built\-in\ Audio\ Analog\ Stereo\ Monitor" name="Built-in Audio Analog Stereo Monitor" exclusive="off" type="jack-audio">
+   <plug>monitor_FL</plug>
+   <plug>monitor_FR</plug>
+  </socket>
+  <socket client="PulseAudio\ Volume\ Control\ Monitor" name="PulseAudio Volume Control Monitor" exclusive="off" type="jack-audio">
+   <plug>monitor_FL\-355</plug>
+   <plug>monitor_FR\-357</plug>
+   <plug>monitor_FL\-362</plug>
+   <plug>monitor_FR\-364</plug>
+   <plug>monitor_FL\-369</plug>
+   <plug>monitor_FR\-371</plug>
+   <plug>monitor_FL\-248</plug>
+   <plug>monitor_FR\-250</plug>
+   <plug>monitor_FL</plug>
+   <plug>monitor_FR</plug>
+  </socket>
+  <socket client="Midi\-Bridge" name="Midi-Bridge" exclusive="off" type="jack-midi">
+   <plug>Midi\ Through\:\(capture_0\)\ Midi\ Through\ Port\-0</plug>
+   <plug>Midi\ Fighter\ Twister\:\(capture_0\)\ Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+   <plug>Scarlett\ 18i20\ USB\:\(capture_0\)\ Scarlett\ 18i20\ USB\ MIDI\ 1</plug>
+  </socket>
+  <socket client="walkman_2" name="walkman_2" exclusive="off" type="jack-midi">
+   <plug>output</plug>
+  </socket>
+  <socket client="Midi\-Bridge" name="Midi-Bridge 2" exclusive="off" type="jack-midi">
+   <plug>Midi\ Fighter\ Twister\:\(capture_0\)\ Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+  <socket client="Midi\ Through" name="Midi Through" exclusive="off" type="alsa-midi">
+   <plug>Midi\ Through\ Port\-0</plug>
+  </socket>
+  <socket client="Midi\ Fighter\ Twister" name="Midi Fighter Twister" exclusive="off" type="alsa-midi">
+   <plug>Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+  <socket client="Scarlett\ 18i20\ USB" name="Scarlett 18i20 USB" exclusive="off" type="alsa-midi">
+   <plug>Scarlett\ 18i20\ USB\ MIDI\ 1</plug>
+  </socket>
+ </output-sockets>
+ <input-sockets>
+  <socket client="Scarlett\ 18i20\ USB\ Multichannel" name="Scarlett 18i20 USB Multichannel" exclusive="off" type="jack-audio">
+   <plug>playback_FL</plug>
+   <plug>playback_FR</plug>
+   <plug>playback_RL</plug>
+   <plug>playback_RR</plug>
+   <plug>playback_FC</plug>
+   <plug>playback_LFE</plug>
+   <plug>playback_SL</plug>
+   <plug>playback_SR</plug>
+   <plug>playback_AUX0</plug>
+   <plug>playback_AUX1</plug>
+  </socket>
+  <socket client="Built\-in\ Audio\ Analog\ Stereo" name="Built-in Audio Analog Stereo" exclusive="off" type="jack-audio">
+   <plug>playback_FL</plug>
+   <plug>playback_FR</plug>
+  </socket>
+  <socket client="PulseAudio\ Volume\ Control" name="PulseAudio Volume Control" exclusive="off" type="jack-audio">
+   <plug>input_FL\-354</plug>
+   <plug>input_FR\-356</plug>
+   <plug>input_FL\-361</plug>
+   <plug>input_FR\-363</plug>
+   <plug>input_FL\-368</plug>
+   <plug>input_FR\-370</plug>
+   <plug>input_FL\-247</plug>
+   <plug>input_FR\-249</plug>
+   <plug>input_FL</plug>
+   <plug>input_FR</plug>
+  </socket>
+  <socket client="walkman_2" name="walkman_2" exclusive="off" type="jack-audio">
+   <plug>input_1</plug>
+   <plug>input_2</plug>
+  </socket>
+  <socket client="PulseAudio\ Volume\ Control" name="PulseAudio Volume Control 2" exclusive="off" type="jack-audio">
+   <plug>input_FL\-247</plug>
+   <plug>input_FR\-249</plug>
+  </socket>
+  <socket client="PulseAudio\ Volume\ Control" name="PulseAudio Volume Control 3" exclusive="off" type="jack-audio">
+   <plug>input_FL\-361</plug>
+   <plug>input_FR\-363</plug>
+  </socket>
+  <socket client="PulseAudio\ Volume\ Control" name="PulseAudio Volume Control 4" exclusive="off" type="jack-audio">
+   <plug>input_FL</plug>
+   <plug>input_FR</plug>
+  </socket>
+  <socket client="Midi\-Bridge" name="Midi-Bridge" exclusive="off" type="jack-midi">
+   <plug>Midi\ Through\:\(playback_0\)\ Midi\ Through\ Port\-0</plug>
+   <plug>Midi\ Fighter\ Twister\:\(playback_0\)\ Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+   <plug>Scarlett\ 18i20\ USB\:\(playback_0\)\ Scarlett\ 18i20\ USB\ MIDI\ 1</plug>
+  </socket>
+  <socket client="walkman_2" name="walkman_2" exclusive="off" type="jack-midi">
+   <plug>input</plug>
+  </socket>
+  <socket client="Midi\ Through" name="Midi Through" exclusive="off" type="alsa-midi">
+   <plug>Midi\ Through\ Port\-0</plug>
+  </socket>
+  <socket client="Midi\ Fighter\ Twister" name="Midi Fighter Twister" exclusive="off" type="alsa-midi">
+   <plug>Midi\ Fighter\ Twister\ MIDI\ 1</plug>
+  </socket>
+  <socket client="Scarlett\ 18i20\ USB" name="Scarlett 18i20 USB" exclusive="off" type="alsa-midi">
+   <plug>Scarlett\ 18i20\ USB\ MIDI\ 1</plug>
+  </socket>
+  <socket client="PipeWire\-RT\-Event" name="PipeWire-RT-Event" exclusive="off" type="alsa-midi">
+   <plug>input</plug>
+  </socket>
+ </input-sockets>
+ <slots/>
+ <cables>
+  <cable output="Built-in Audio Analog Stereo" type="jack-audio" input="PulseAudio Volume Control 2"/>
+  <cable output="Scarlett 18i20 USB Multichannel" type="jack-audio" input="walkman_2"/>
+  <cable output="walkman_2" type="jack-audio" input="Scarlett 18i20 USB Multichannel"/>
+  <cable output="Built-in Audio Analog Stereo Monitor" type="jack-audio" input="PulseAudio Volume Control 4"/>
+  <cable output="Midi-Bridge 2" type="jack-midi" input="walkman_2"/>
+  <cable output="Midi Through" type="alsa-midi" input="PipeWire-RT-Event"/>
+  <cable output="Midi Fighter Twister" type="alsa-midi" input="PipeWire-RT-Event"/>
+  <cable output="Scarlett 18i20 USB" type="alsa-midi" input="PipeWire-RT-Event"/>
+ </cables>
+</patchbay>
+
