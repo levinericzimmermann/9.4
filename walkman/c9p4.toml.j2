@@ -14,13 +14,17 @@ name = "c9p4"                                                       #
 {% set midi_control_number_offset = 16 %}
 {% set midi_control_number_line_master = midi_control_number_offset %}
 {% set midi_control_number_line_speaker = midi_control_number_offset + 1 %}
-{% set midi_control_number_line_degrader = midi_control_number_offset + 2 %}
-{% set midi_control_number_line_resonator = midi_control_number_offset + 3 %}
+{% set midi_control_number_line_resonator = midi_control_number_offset + 2 %}
+{% set midi_control_number_line_degrader = midi_control_number_offset + 3 %}
 
 {% set line_size = 4 %}
 
-{% set speaker_count = 2 %}
-{% set channel_count = 2 %}
+{% set speaker_radio_count = 2 %}
+{% set speaker_instrument_count = 3 %}
+{% set channel_count = 5 %}
+
+{% set pitch_ratio_detector_frequency_range_list = [[100, 400], [400, 1600], [1600, 6400]] %}
+{% set pitch_ratio_detector_count = pitch_ratio_detector_frequency_range_list|length %}
 
 [configure.audio]
 channel_count = {{ channel_count }}
@@ -29,64 +33,114 @@ channel_count = {{ channel_count }}
 send_to_physical_output = true
 decibel = "midi_control_input.master_decibel"
 audio_input_0 = "mixer.pre_master"
-audio_input_1 = "waveguide_reverb.reverb"
 
 [configure.module.mixer.pre_master]
-audio_input_0 = "mixer.speaker"
+audio_input_0 = "mixer.speaker_radio"
 audio_input_1 = "mixer.degrader"
-audio_input_2 = "mixer.resonator"
+audio_input_2 = "mixer.resonator_radio"
+audio_input_3 = "amplification.instrument"
+audio_input_4 = "mixer.speaker_instrument"
+audio_input_5 = "mixer.resonator_instrument"
 
-[configure.module.waveguide_reverb.reverb]
-decibel = "midi_control_input.reverb_decibel"
-# XXX: Doesn't work! Bug in walkman! Has to be fixed!
-# audio_input = "mixer.pre_master"
+# Send instrument and radio to all channels
+[configure.module.mixer.pre_master.default_dict.audio_input_3_channel_mapping]
+0 = [0, 1, 2, 3, 4]
 
-[configure.module.mixer.speaker]
-decibel = "midi_control_input.speaker_decibel"
-{% for speaker_index in range(speaker_count) %}
-audio_input_{{ speaker_index }} = "speaker.{{ speaker_index }}"
+[configure.module.mixer.pre_master.default_dict.audio_input_1_channel_mapping]
+0 = [0, 1, 2, 3, 4]
+
+{% for pitch_ratio_detector_index in range(pitch_ratio_detector_count) %}
+[configure.module.pitch_ratio_detector.{{ pitch_ratio_detector_index }}]
+{% set pitch_ratio_detector_frequency_range = pitch_ratio_detector_frequency_range_list[pitch_ratio_detector_index] %}
+audio_input = "audio_input.instrument"
+min_frequency = {{ pitch_ratio_detector_frequency_range[0] }}
+max_frequency = {{ pitch_ratio_detector_frequency_range[1] }}
 {% endfor %}
 
-{% for speaker_index in range(speaker_count) %}
-[configure.module.mixer.speaker.default_dict.audio_input_{{- speaker_index -}}_channel_mapping]
+[configure.module.mixer.speaker_radio]
+decibel = "midi_control_input.speaker_radio_decibel"
+{% for speaker_index in range(speaker_radio_count) %}
+audio_input_{{ speaker_index }} = "speaker.radio_{{ speaker_index }}"
+{% endfor %}
+
+{% for speaker_index in range(speaker_radio_count) %}
+[configure.module.mixer.speaker_radio.default_dict.audio_input_{{- speaker_index -}}_channel_mapping]
 0 = {{ speaker_index % channel_count }}
 {% endfor %}
 
-{% for speaker_index in range(speaker_count) %}
-[configure.module.speaker.{{ speaker_index }}]
+{% for speaker_index in range(speaker_radio_count) %}
+[configure.module.speaker.radio_{{ speaker_index }}]
 audio_input = "degrader.0"
-threshold = "midi_control_input.speaker_threshold"
+threshold = "midi_control_input.speaker_radio_threshold"
+{% endfor %}
 
-[configure.module.value.speaker_{{ speaker_index }}_child_decibel]
+[configure.module.mixer.speaker_instrument]
+decibel = "midi_control_input.speaker_instrument_decibel"
+{% for speaker_index in range(speaker_instrument_count) %}
+audio_input_{{ speaker_index }} = "speaker.instrument_{{ speaker_index }}"
+{% endfor %}
+
+{% for speaker_index in range(speaker_instrument_count) %}
+[configure.module.mixer.speaker_instrument.default_dict.audio_input_{{- speaker_index -}}_channel_mapping]
+0 = {{ speaker_index % channel_count }}
+{% endfor %}
+
+{% for speaker_index in range(speaker_instrument_count) %}
+[configure.module.speaker.instrument_{{ speaker_index }}]
+audio_input = "audio_input.instrument"
+threshold = "midi_control_input.speaker_instrument_threshold"
+
+[configure.module.value.speaker_instrument_{{ speaker_index }}_child_decibel]
 value = 0
 {% endfor %}
 
-[configure.module.audio_input.0]
+[configure.module.audio_input.radio]
 input_channel_index = 0
+
+[configure.module.audio_input.instrument]
+input_channel_index = 1
 
 [configure.module.mixer.degrader]
 audio_input_0 = "degrader.0"
 decibel = "midi_control_input.degrader_decibel"
 
 [configure.module.degrader.0]
-audio_input = "audio_input.0"
+audio_input = "audio_input.radio"
 bitdepth = "midi_control_input.degrader_bitdepth"
 sample_rate_scale = "midi_control_input.degrader_sample_rate_scale"
 
 [configure.module.midi_logger.test]
 
-[configure.module.mixer.resonator]
-decibel = "midi_control_input.resonator_decibel"
-{% for resonator_index in range(speaker_count) %}
-audio_input_{{ resonator_index }} = "resonator.{{ resonator_index }}"
+[configure.module.amplification.instrument]
+audio_input = "audio_input.instrument"
+decibel = "midi_control_input.amplification_decibel"
+
+[configure.module.mixer.resonator_radio]
+decibel = "midi_control_input.resonator_radio_decibel"
+{% for resonator_index in range(speaker_radio_count) %}
+audio_input_{{ resonator_index }} = "resonator.radio_{{ resonator_index }}"
 {% endfor %}
 
-{% for resonator_index in range(speaker_count) %}
-[configure.module.resonator.{{ resonator_index }}]
+{% for resonator_index in range(speaker_radio_count) %}
+[configure.module.resonator.radio_{{ resonator_index }}]
 # audio_input = "mixer.speaker"
-frequency = "midi_control_input.resonator_frequency"
-audio_input = "speaker.{{ resonator_index }}"
-decibel = "midi_control_input.resonator_decibel"
+# frequency = "midi_control_input.resonator_frequency"
+pitch_ratio = "pitch_ratio_detector.{{ resonator_index % pitch_ratio_detector_count }}"
+audio_input = "speaker.radio_{{ resonator_index }}"
+decibel = "midi_control_input.resonator_radio_decibel"
+{% endfor %}
+
+[configure.module.mixer.resonator_instrument]
+decibel = "midi_control_input.resonator_instrument_decibel"
+{% for resonator_index in range(speaker_instrument_count) %}
+audio_input_{{ resonator_index }} = "resonator.instrument_{{ resonator_index }}"
+{% endfor %}
+
+{% for resonator_index in range(speaker_instrument_count) %}
+[configure.module.resonator.instrument_{{ resonator_index }}]
+pitch_ratio = "pitch_ratio_detector.{{ resonator_index % pitch_ratio_detector_count }}"
+audio_input = "speaker.instrument_{{ resonator_index }}"
+decibel = "midi_control_input.resonator_instrument_decibel"
 {% endfor %}
 
 # #################################################################
@@ -97,15 +151,15 @@ midi_control_number = {{ midi_control_number_line_master }}
 initial_value = -6
 
 [configure.module.midi_control_input.master_decibel.default_dict]
-minima = -100
+minima = -80
 maxima = 12
 
-[configure.module.midi_control_input.reverb_decibel]
-midi_control_number = {{ midi_control_number_line_master + line_size }}
-initial_value = -20
+[configure.module.midi_control_input.amplification_decibel]
+midi_control_number = {{ midi_control_number_line_master + (line_size * 2) }}
+initial_value = -12
 
-[configure.module.midi_control_input.reverb_decibel.default_dict]
-minima = -100
+[configure.module.midi_control_input.amplification_decibel.default_dict]
+minima = -80
 maxima = 12
 
 # END Configure MIDI Input MASTER #################################
@@ -115,21 +169,21 @@ maxima = 12
 # #################################################################
 # START Configure MIDI Input RESONATOR ############################
 
-[configure.module.midi_control_input.resonator_decibel]
+[configure.module.midi_control_input.resonator_radio_decibel]
 midi_control_number = {{ midi_control_number_line_resonator }}
 initial_value = -6
 
-[configure.module.midi_control_input.resonator_decibel.default_dict]
+[configure.module.midi_control_input.resonator_radio_decibel.default_dict]
 minima = -100
 maxima = 12
 
-[configure.module.midi_control_input.resonator_frequency]
-midi_control_number = {{ midi_control_number_line_resonator + 4 }}
-initial_value = 220
+[configure.module.midi_control_input.resonator_instrument_decibel]
+midi_control_number = {{ midi_control_number_line_resonator + (line_size * 2) }}
+initial_value = -6
 
-[configure.module.midi_control_input.resonator_frequency.default_dict]
-minima = 100
-maxima = 1000
+[configure.module.midi_control_input.resonator_instrument_decibel.default_dict]
+minima = -100
+maxima = 12
 
 # END Configure MIDI Input RESONATOR ##############################
 # #################################################################
@@ -138,21 +192,37 @@ maxima = 1000
 # #################################################################
 # START Configure MIDI Input SPEAKER ##############################
 
-[configure.module.midi_control_input.speaker_decibel]
+[configure.module.midi_control_input.speaker_radio_decibel]
 midi_control_number = {{ midi_control_number_line_speaker }}
 initial_value = -6
 
-[configure.module.midi_control_input.speaker_decibel.default_dict]
+[configure.module.midi_control_input.speaker_radio_decibel.default_dict]
 minima = -100
 maxima = 0
 
-[configure.module.midi_control_input.speaker_threshold]
+[configure.module.midi_control_input.speaker_radio_threshold]
 midi_control_number = {{ midi_control_number_line_speaker + line_size }}
 initial_value = -12
 
-[configure.module.midi_control_input.speaker_threshold.default_dict]
+[configure.module.midi_control_input.speaker_radio_threshold.default_dict]
 minima = -40
-maxima = -8
+maxima = 0
+
+[configure.module.midi_control_input.speaker_instrument_decibel]
+midi_control_number = {{ midi_control_number_line_speaker + (line_size * 3) }}
+initial_value = -6
+
+[configure.module.midi_control_input.speaker_instrument_decibel.default_dict]
+minima = -100
+maxima = 0
+
+[configure.module.midi_control_input.speaker_instrument_threshold]
+midi_control_number = {{ midi_control_number_line_speaker + (line_size * 4) }}
+initial_value = -12
+
+[configure.module.midi_control_input.speaker_instrument_threshold.default_dict]
+minima = -40
+maxima = 0
 
 # END Configure MIDI Input SPEAKER ################################
 # #################################################################
@@ -192,10 +262,20 @@ maxima = 1
 # =================================================================
 # =================================================================
 
+# MIDI TEST CUE
+
 [cue.midi_test.midi_logger.test]
 
-{% for speaker_index in range(speaker_count) %}
-[cue.main.speaker.{{ speaker_index }}]
+# MAIN CUE
+
+{% for speaker_index in range(speaker_radio_count) %}
+[cue.main.speaker.radio_{{ speaker_index }}]
+{% endfor %}
+
+{% for speaker_index in range(speaker_instrument_count) %}
+[cue.main.speaker.instrument_{{ speaker_index }}]
 {% endfor %}
 
 [cue.main.degrader.0]
+
+[cue.main.amplification.instrument]
